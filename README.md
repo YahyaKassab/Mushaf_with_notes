@@ -79,6 +79,30 @@ A modern digital Mushaf application backend that preserves the authenticity of t
    docker-compose down
    ```
 
+## 🧪 API Testing with Postman
+
+This repository includes a comprehensive Postman collection for testing all API endpoints:
+
+- **`Mushaf_with_Notes_API.postman_collection.json`** - Complete collection with 35+ endpoints
+- **`Mushaf_with_Notes_Development.postman_environment.json`** - Environment variables
+- **`POSTMAN_GUIDE.md`** - Detailed usage guide
+
+### Quick Setup
+1. Import both JSON files into Postman
+2. Select the "Mushaf with Notes - Development" environment
+3. Start with Health Check → Register/Login → Create Mushaf
+4. All authentication tokens and IDs are automatically managed
+
+### Key Features
+- ✅ Automatic JWT token management
+- ✅ Smart ID saving for created resources
+- ✅ Comprehensive test coverage
+- ✅ Realistic sample data
+- ✅ Complete endpoint documentation
+- ✅ Error handling examples
+
+For detailed instructions, see [`POSTMAN_GUIDE.md`](./POSTMAN_GUIDE.md).
+
 ## 📚 API Documentation
 
 ### Authentication Endpoints
