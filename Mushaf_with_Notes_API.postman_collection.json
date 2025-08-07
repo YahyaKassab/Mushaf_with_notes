@@ -1,0 +1,1521 @@
+{
+  "info": {
+    "name": "Mushaf with Notes API",
+    "description": "Complete API collection for the Mushaf with Notes application - a digital Quran study platform with comprehensive backend functionality including authentication, Mushaf management, notes, word interactions, letter marks, and search capabilities.",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "// This will run before every request in the collection"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test('Response time is reasonable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('Response has success field', function () {",
+          "    const jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('success');",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mushafId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "noteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "interactionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "markId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Documentation",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if the API server is running and healthy"
+          },
+          "response": []
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api",
+              "host": ["{{baseUrl}}"],
+              "path": ["api"]
+            },
+            "description": "Get comprehensive API documentation with all available endpoints"
+          },
+          "response": []
+        }
+      ],
+      "description": "Basic health and documentation endpoints"
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('User registration successful', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('accessToken');",
+                  "    pm.expect(jsonData.data).to.have.property('refreshToken');",
+                  "    ",
+                  "    // Save tokens for subsequent requests",
+                  "    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', jsonData.data.refreshToken);",
+                  "    pm.collectionVariables.set('userId', jsonData.data.user._id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user account"
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('accessToken');",
+                  "    pm.expect(jsonData.data).to.have.property('refreshToken');",
+                  "    ",
+                  "    // Save tokens for subsequent requests",
+                  "    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', jsonData.data.refreshToken);",
+                  "    pm.collectionVariables.set('userId', jsonData.data.user._id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with existing user credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Token refresh successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('accessToken');",
+                  "    pm.expect(jsonData.data).to.have.property('refreshToken');",
+                  "    ",
+                  "    // Update tokens",
+                  "    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', jsonData.data.refreshToken);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh"]
+            },
+            "description": "Refresh access token using refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Get current user profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Name\",\n  \"preferences\": {\n    \"theme\": \"dark\",\n    \"language\": \"en\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Update user profile information and preferences"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Logout user and invalidate refresh token"
+          },
+          "response": []
+        }
+      ],
+      "description": "User authentication and profile management endpoints"
+    },
+    {
+      "name": "Mushafs",
+      "item": [
+        {
+          "name": "Get All Mushafs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mushafs?page=1&limit=10&sort=createdAt&order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mushafs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            },
+            "description": "Get all user's Mushafs with pagination and sorting"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Mushaf",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Mushaf created successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('mushaf');",
+                  "    ",
+                  "    // Save mushaf ID for subsequent requests",
+                  "    pm.collectionVariables.set('mushafId', jsonData.data.mushaf._id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Study Mushaf\",\n  \"description\": \"Personal Mushaf for memorization and study\",\n  \"settings\": {\n    \"isPublic\": false,\n    \"allowCollaboration\": false,\n    \"theme\": \"classic\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/mushafs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mushafs"]
+            },
+            "description": "Create a new personal Mushaf"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Mushaf",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mushafs/{{mushafId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mushafs", "{{mushafId}}"]
+            },
+            "description": "Get details of a specific Mushaf"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Mushaf",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Mushaf Name\",\n  \"description\": \"Updated description\",\n  \"settings\": {\n    \"theme\": \"modern\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/mushafs/{{mushafId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mushafs", "{{mushafId}}"]
+            },
+            "description": "Update Mushaf details and settings"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Current Page",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pageNumber\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/mushafs/{{mushafId}}/current-page",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mushafs", "{{mushafId}}", "current-page"]
+            },
+            "description": "Update the current page being viewed in the Mushaf"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Mushaf Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mushafs/{{mushafId}}/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mushafs", "{{mushafId}}", "statistics"]
+            },
+            "description": "Get statistics for a specific Mushaf (notes count, interactions, etc.)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Mushaf",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mushafs/{{mushafId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mushafs", "{{mushafId}}"]
+            },
+            "description": "Delete a Mushaf (WARNING: This will also delete related notes, interactions, and marks)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Mushaf management endpoints for creating and managing personal Quran copies"
+    },
+    {
+      "name": "Pages",
+      "item": [
+        {
+          "name": "Get All Pages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pages?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pages"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get all pages with pagination (excludes coordinate data for performance)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Page",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pages/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pages", "1"]
+            },
+            "description": "Get complete page data including word and line coordinates"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Page Metadata",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pages/1/metadata",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pages", "1", "metadata"]
+            },
+            "description": "Get page metadata only (image URL, surah info, etc.)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Page Word Coordinates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pages/1/words",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pages", "1", "words"]
+            },
+            "description": "Get word coordinates for a specific page"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Page Line Coordinates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pages/1/lines",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pages", "1", "lines"]
+            },
+            "description": "Get line coordinates for a specific page"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Words on Page",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pages/1/search?query=الله&surah=1&ayah=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pages", "1", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "الله"
+                },
+                {
+                  "key": "surah",
+                  "value": "1"
+                },
+                {
+                  "key": "ayah",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Search for specific words on a page with optional surah/ayah filters"
+          },
+          "response": []
+        }
+      ],
+      "description": "Page navigation and content access endpoints for the 604 Medina Mushaf pages"
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "Get Notes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notes?mushaf={{mushafId}}&page=1&limit=20&category=memorization",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes"],
+              "query": [
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "category",
+                  "value": "memorization"
+                }
+              ]
+            },
+            "description": "Get all notes for a specific Mushaf with optional filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Note",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Note created successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('note');",
+                  "    ",
+                  "    // Save note ID for subsequent requests",
+                  "    pm.collectionVariables.set('noteId', jsonData.data.note._id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Memorization Note\",\n  \"content\": \"This verse is about seeking refuge with Allah\",\n  \"mushaf\": \"{{mushafId}}\",\n  \"page\": \"507f1f77bcf86cd799439011\",\n  \"position\": {\n    \"lineNumber\": 1,\n    \"wordPosition\": 5,\n    \"x\": 100,\n    \"y\": 150\n  },\n  \"category\": \"memorization\",\n  \"tags\": [\"refuge\", \"protection\"],\n  \"color\": \"#FFE4B5\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/notes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes"]
+            },
+            "description": "Create a new note aligned to a specific line and position"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Note",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notes/{{noteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes", "{{noteId}}"]
+            },
+            "description": "Get details of a specific note"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Note",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Note Title\",\n  \"content\": \"Updated note content with additional insights\",\n  \"category\": \"tajweed\",\n  \"tags\": [\"updated\", \"tajweed\", \"pronunciation\"],\n  \"color\": \"#E6F3FF\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/notes/{{noteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes", "{{noteId}}"]
+            },
+            "description": "Update an existing note"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notes by Page",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notes/page/507f1f77bcf86cd799439011?mushaf={{mushafId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes", "page", "507f1f77bcf86cd799439011"],
+              "query": [
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                }
+              ]
+            },
+            "description": "Get all notes for a specific page"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Notes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notes/search?query=memorization&mushaf={{mushafId}}&category=memorization",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "memorization"
+                },
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                },
+                {
+                  "key": "category",
+                  "value": "memorization"
+                }
+              ]
+            },
+            "description": "Search notes by title, content, or tags"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Note",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notes/{{noteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes", "{{noteId}}"]
+            },
+            "description": "Delete a specific note"
+          },
+          "response": []
+        }
+      ],
+      "description": "Notes management endpoints for creating line-aligned annotations and study notes"
+    },
+    {
+      "name": "Word Interactions",
+      "item": [
+        {
+          "name": "Get Word Interactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interactions?mushaf={{mushafId}}&interactionType=highlight",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interactions"],
+              "query": [
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                },
+                {
+                  "key": "interactionType",
+                  "value": "highlight"
+                }
+              ]
+            },
+            "description": "Get all word interactions for a Mushaf with optional filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Word Interaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Word interaction created successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('interaction');",
+                  "    ",
+                  "    // Save interaction ID for subsequent requests",
+                  "    pm.collectionVariables.set('interactionId', jsonData.data.interaction._id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mushaf\": \"{{mushafId}}\",\n  \"page\": \"507f1f77bcf86cd799439011\",\n  \"wordId\": \"word_1_1_1\",\n  \"interactionType\": \"highlight\",\n  \"style\": {\n    \"color\": \"#FFD700\",\n    \"thickness\": 2,\n    \"opacity\": 0.7\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interactions"]
+            },
+            "description": "Create a new word interaction (highlight, underline, bookmark)"
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Word Interaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mushaf\": \"{{mushafId}}\",\n  \"page\": \"507f1f77bcf86cd799439011\",\n  \"wordId\": \"word_1_1_2\",\n  \"interactionType\": \"bookmark\",\n  \"style\": {\n    \"color\": \"#FF6B6B\",\n    \"thickness\": 3,\n    \"opacity\": 0.8\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interactions/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interactions", "toggle"]
+            },
+            "description": "Toggle word interaction - create if doesn't exist, remove if exists"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Word Interaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interactions/{{interactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interactions", "{{interactionId}}"]
+            },
+            "description": "Get details of a specific word interaction"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Interactions by Word",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interactions/word/word_1_1_1?mushaf={{mushafId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interactions", "word", "word_1_1_1"],
+              "query": [
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                }
+              ]
+            },
+            "description": "Get all interactions for a specific word"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Word Interaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"style\": {\n    \"color\": \"#00FF00\",\n    \"thickness\": 4,\n    \"opacity\": 0.9\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interactions/{{interactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interactions", "{{interactionId}}"]
+            },
+            "description": "Update the style of a word interaction"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Word Interaction",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interactions/{{interactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interactions", "{{interactionId}}"]
+            },
+            "description": "Delete a specific word interaction"
+          },
+          "response": []
+        }
+      ],
+      "description": "Word-level interaction endpoints for highlights, underlines, and bookmarks"
+    },
+    {
+      "name": "Letter Marks",
+      "item": [
+        {
+          "name": "Get Letter Marks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/marks?mushaf={{mushafId}}&category=tajweed&markType=circle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "marks"],
+              "query": [
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                },
+                {
+                  "key": "category",
+                  "value": "tajweed"
+                },
+                {
+                  "key": "markType",
+                  "value": "circle"
+                }
+              ]
+            },
+            "description": "Get all letter marks for a Mushaf with optional filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Letter Mark",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Letter mark created successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('mark');",
+                  "    ",
+                  "    // Save mark ID for subsequent requests",
+                  "    pm.collectionVariables.set('markId', jsonData.data.mark._id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mushaf\": \"{{mushafId}}\",\n  \"page\": \"507f1f77bcf86cd799439011\",\n  \"wordId\": \"word_1_1_1\",\n  \"letterPosition\": 3,\n  \"markType\": \"circle\",\n  \"coordinates\": {\n    \"x\": 150,\n    \"y\": 200,\n    \"radius\": 8\n  },\n  \"style\": {\n    \"color\": \"#FF6B6B\",\n    \"thickness\": 1,\n    \"opacity\": 0.8\n  },\n  \"category\": \"tajweed\",\n  \"note\": \"Correct pronunciation of this letter\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/marks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "marks"]
+            },
+            "description": "Create a new letter mark with coordinates and styling"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Letter Mark",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/marks/{{markId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "marks", "{{markId}}"]
+            },
+            "description": "Get details of a specific letter mark"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Marks by Word",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/marks/word/word_1_1_1?mushaf={{mushafId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "marks", "word", "word_1_1_1"],
+              "query": [
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                }
+              ]
+            },
+            "description": "Get all letter marks for a specific word"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Marks by Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/marks/category/tajweed?mushaf={{mushafId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "marks", "category", "tajweed"],
+              "query": [
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                }
+              ]
+            },
+            "description": "Get all letter marks in a specific category"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Letter Marks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/marks/search?query=pronunciation&mushaf={{mushafId}}&category=tajweed",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "marks", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "pronunciation"
+                },
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                },
+                {
+                  "key": "category",
+                  "value": "tajweed"
+                }
+              ]
+            },
+            "description": "Search letter marks by note content"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Letter Mark",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coordinates\": {\n    \"x\": 160,\n    \"y\": 210,\n    \"radius\": 10\n  },\n  \"style\": {\n    \"color\": \"#00FF00\",\n    \"thickness\": 2,\n    \"opacity\": 0.9\n  },\n  \"note\": \"Updated note about letter pronunciation\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/marks/{{markId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "marks", "{{markId}}"]
+            },
+            "description": "Update a letter mark's coordinates, style, or note"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Letter Mark",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/marks/{{markId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "marks", "{{markId}}"]
+            },
+            "description": "Delete a specific letter mark"
+          },
+          "response": []
+        }
+      ],
+      "description": "Letter-specific marking endpoints for tajweed corrections and emphasis"
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Global Search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/search?query=الله&mushaf={{mushafId}}&type=all&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "الله"
+                },
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                },
+                {
+                  "key": "type",
+                  "value": "all"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Search across all user data (notes, marks, Quran text)"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Notes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/search/notes?query=memorization&mushaf={{mushafId}}&category=memorization&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "notes"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "memorization"
+                },
+                {
+                  "key": "mushaf",
+                  "value": "{{mushafId}}"
+                },
+                {
+                  "key": "category",
+                  "value": "memorization"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Search specifically in notes with pagination and filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Quran Text",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/search/quran?query=بسم&surah=1&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "quran"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "بسم"
+                },
+                {
+                  "key": "surah",
+                  "value": "1"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Search in Quran text with highlighting and surah/ayah filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Advanced Search",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"tajweed\",\n  \"mushaf\": \"{{mushafId}}\",\n  \"dateRange\": {\n    \"from\": \"2024-01-01\",\n    \"to\": \"2024-12-31\"\n  },\n  \"categories\": [\"tajweed\", \"memorization\"],\n  \"includeNotes\": true,\n  \"includeMarks\": true,\n  \"includeQuran\": false,\n  \"sortBy\": \"relevance\",\n  \"page\": 1,\n  \"limit\": 20\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/search/advanced",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "advanced"]
+            },
+            "description": "Advanced search with date ranges, categories, and multiple filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Suggestions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/search/suggestions?query=mem&type=all&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "suggestions"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "mem"
+                },
+                {
+                  "key": "type",
+                  "value": "all"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get search suggestions/autocomplete based on user's notes and tags"
+          },
+          "response": []
+        }
+      ],
+      "description": "Comprehensive search endpoints for finding content across all user data"
+    }
+  ]
+}
