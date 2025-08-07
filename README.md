@@ -29,34 +29,102 @@ A modern digital Mushaf application backend that preserves the authenticity of t
 
 ## 🚀 Quick Start
 
-### Development Setup
+### Option 1: Quick Setup (Recommended)
+```bash
+# Clone and install
+git clone <repository-url>
+cd Mushaf_with_notes
+npm install
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/YahyaKassab/Mushaf_with_notes.git
-   cd Mushaf_with_notes
-   ```
+# Copy environment configuration
+cp .env.example .env
+# Edit .env with your settings (MongoDB URI, etc.)
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# Run quick setup (sets up everything + sample data)
+npm run setup
 
-3. **Setup environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+# Start development server
+npm run dev
+```
 
-4. **Start MongoDB** (if running locally)
-   ```bash
-   mongod
-   ```
+### Option 2: Manual Setup
+```bash
+# Install dependencies
+npm install
 
-5. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+# Set up environment
+cp .env.example .env
+# Configure your .env file
+
+# Start MongoDB (if local)
+mongod
+
+# Start the server
+npm run dev
+
+# In another terminal, populate data
+npm run populate:sample  # First 10 pages
+# or
+npm run populate        # All 604 pages (takes 20-30 minutes)
+```
+
+### Option 3: Docker Setup
+```bash
+# Using Docker Compose
+docker-compose up -d
+
+# Populate data
+docker-compose exec app npm run setup
+```
+
+## 📊 Data Population
+
+The application automatically fetches Quran verses and page images from **Quran.com API** and **QuranCDN**.
+
+### Available Scripts
+- `npm run setup` - Quick setup with sample data (5 pages)
+- `npm run populate:sample` - Populate first 10 pages
+- `npm run populate` - Populate all 604 pages (~20-30 minutes)
+- `npm run populate -- -s 50 -e 100` - Populate pages 50-100
+- `npm run populate -- --force` - Force update existing pages
+
+### Data Sources
+- **Verses**: Quran.com API (`api.quran.com`)
+- **Images**: QuranCDN (`cdn.qurancdn.com`)
+- **Coordinates**: Quran Cloud API (`api.qurancdn.com`)
+
+### Storage Requirements
+- **Sample data (10 pages)**: ~20MB
+- **Complete dataset (604 pages)**: ~500MB
+- **High-quality images**: ~800KB per page
+- **Medium-quality images**: ~400KB per page
+
+## 🛠️ Development
+
+### Prerequisites
+- Node.js 18+
+- MongoDB 7.0+
+- Internet connection (for initial data population)
+
+### Environment Configuration
+Copy `.env.example` to `.env` and configure:
+
+```bash
+# Server
+PORT=3000
+BASE_URL=http://localhost:3000
+
+# Database
+MONGODB_URI=mongodb://localhost:27017/mushaf_with_notes
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_REFRESH_SECRET=your-refresh-secret
+
+# API Rate Limiting
+API_RATE_LIMIT=100
+API_WINDOW_MS=900000
+```
 
 6. **Access the API**
    - Health Check: http://localhost:3000/health

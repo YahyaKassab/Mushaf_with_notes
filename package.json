@@ -6,6 +6,12 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "setup": "node scripts/setup.js",
+    "populate": "node scripts/populate-data.js",
+    "populate:sample": "node scripts/populate-data.js -s 1 -e 10",
+    "populate:force": "node scripts/populate-data.js --force",
+    "test:api": "node scripts/test-api.js",
+    "create:user": "node scripts/create-test-user.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -19,15 +25,19 @@
   "author": "Yahya Kassab",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.21.2",
     "express-rate-limit": "^8.0.1",
+    "fs-extra": "^11.3.0",
     "helmet": "^8.1.0",
     "joi": "^18.0.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.17.0"
+    "mongoose": "^8.17.0",
+    "multer": "^2.0.2",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

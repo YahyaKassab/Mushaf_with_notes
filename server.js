@@ -13,6 +13,7 @@ const noteRoutes = require('./routes/notes');
 const interactionRoutes = require('./routes/interactions');
 const markRoutes = require('./routes/marks');
 const searchRoutes = require('./routes/search');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -47,6 +48,9 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Static file serving for images
+app.use('/images', express.static('public/images'));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
@@ -59,6 +63,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/mushafs', mushafRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/notes', noteRoutes);

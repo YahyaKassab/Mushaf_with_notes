@@ -1,6 +1,7 @@
 const express = require('express');
 const { Page } = require('../models');
 const authenticate = require('../middleware/auth');
+const quranApi = require('../services/quranApi');
 
 const router = express.Router();
 
@@ -244,6 +245,85 @@ router.get('/:pageNumber/search', authenticate, async (req, res) => {
         totalMatches: filteredWords.length
       }
     });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
+
+// Get verses text for a specific page
+router.get('/:pageNumber/verses', authenticate, async (req, res) => {
+  try {
+    const pageNumber = parseInt(req.params.pageNumber);
+    
+    if (pageNumber < 1 || pageNumber > 604) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid page number. Must be between 1 and 604.'
+      });
+    }
+
+    // Try to get verses from Quran API
+    try {
+      const versesData = await quranApi.getPageVerses(pageNumber);
+      
+      res.json({
+        success: true,
+        data: {
+          pageNumber,
+          verses: versesData.verses || [],
+          totalVerses: versesData.verses?.length || 0,
+          source: 'api'
+        }
+      });
+    } catch (apiError) {
+      // Fallback: return verses from page word coordinates if API fails
+      const page = await Page.findOne({ pageNumber }).select('wordCoordinates');
+      
+      if (!page) {
+        return res.status(404).json({
+          success: false,
+          message: 'Page not found and API unavailable'
+        });
+      }
+
+      // Group words by verse
+      const versesMap = new Map();
+      page.wordCoordinates.forEach(word => {
+        const verseKey = `${word.surah}:${word.ayah}`;
+        if (!versesMap.has(verseKey)) {
+          versesMap.set(verseKey, {
+            chapter_id: word.surah,
+            verse_number: word.ayah,
+            verse_key: verseKey,
+            text_uthmani: '',
+            words: []
+          });
+        }
+        versesMap.get(verseKey).words.push(word);
+        versesMap.get(verseKey).text_uthmani += (word.text || '') + ' ';
+      });
+
+      const verses = Array.from(versesMap.values()).map(verse => ({
+        ...verse,
+        text_uthmani: verse.text_uthmani.trim()
+      }));
+
+      res.json({
+        success: true,
+        data: {
+          pageNumber,
+          verses,
+          totalVerses: verses.length,
+          source: 'local'
+        },
+        warning: 'Data retrieved from local coordinates due to API unavailability'
+      });
+    }
+
   } catch (error) {
     res.status(500).json({
       success: false,
